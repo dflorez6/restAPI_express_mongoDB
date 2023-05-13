@@ -11,16 +11,26 @@ const router = Router();
 // Index
 router.get('/', 
     // Return Function
-    (req, res) => {
-        return res.send(Object.values(req.context.models.users)); // Returns the object values from the Models
+    async (req, res) => {
+        // Retrieves all Users from DB
+        const users = await req.context.models.User.find();
+        
+        // Returns all Users
+        return res.send(users);
     }
 );
 
 // Show
 router.get('/:userId',
     // Return Function
-    (req, res) => {
-        return res.send(req.context.models.users[req.params.userId]); // Returns a specific user depending on the userId from the URI
+    async (req, res) => {
+        // Retrieves User from DB by id
+        const user = await req.context.models.User.findById(
+            req.params.userId
+        );
+
+        // Returns User by userId passed as param on the URL
+        return res.send(user);
     }
 );
 

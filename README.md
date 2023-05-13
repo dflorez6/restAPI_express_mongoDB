@@ -33,10 +33,10 @@ https://www.youtube.com/watch?v=PxshhOKNPpQ
         // Example PORT=3000 will be the ENV variable used
         process.env.PORT
 
-## Postgresql With Sequelize (ORM) In Express Installation
+## MongoDB with Mongoose (ORM) In Express Installation
 * From the terminal:
     
-    > npm install pg sequelize --save
+    > npm install mongoose --save
 
 ## Library: Cross-Origin Resource Sharing - CORS
 * Install from the terminal:

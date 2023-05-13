@@ -2,7 +2,6 @@
 // Message Routes
 //====================
 // Import the dependencies
-import { v4 as uuidv4 } from 'uuid'; // Unique IDs Library
 import { Router } from 'express';
 const router = Router();
 
@@ -12,16 +11,26 @@ const router = Router();
 // Index
 router.get('/',
     // Return Function
-    (req, res) => {
-        return res.send(Object.values(req.context.models.messages));
+    async (req, res) => {
+        // Retrieves all Messages from DB
+        const messages = await req.context.models.Message.find();
+        
+        // Returns all Messages
+        return res.send(messages);
     }
 );
 
 // Show
 router.get('/:messageId',
     // Return Function
-    (req, res) => {
-        return res.send(req.context.models.messages[req.params.messageId]); // Returns a specific user depending on the userId from the URI
+    async (req, res) => {
+        // Retrieves Message from DB by id
+        const message = await req.context.models.Message.findById(
+            req.params.messageId
+        );
+
+        // Returns Message by messageId passed as param on the URL
+        return res.send(message);
     }
 );
 
@@ -31,19 +40,14 @@ router.get('/:messageId',
 // Create
 router.post('/',
     // Return Function
-    (req, res) => {
-        // Create unique identifier
-        const id = uuidv4();
-        // Use id as a property in a message object with a shorthand object property initialization
-        const message = {
-            id,
-            // Extract payload from incoming request
-            text: req.body.text,
-            userId: req.context.me.id,
-        }
-        
-        // Assign the message by identifier to the specific Message Object
-        req.context.models.messages[id] = message;
+    async (req, res) => {
+        // Create Message object to be inserted into DB
+        const message = await req.context.models.Message.create(
+            {
+                text: req.body.text,
+                user: req.context.me.id,
+            }
+        );
 
         // Return new message after it has been created
         return res.send(message);
@@ -54,6 +58,7 @@ router.post('/',
 // 'PUT'
 //--------------------
 // Update
+// TODO: PENDING FOR IMPLEMENTATION WITH DB
 router.put('/:messageId',
     // Return Function
     (req, res) => {
@@ -76,15 +81,19 @@ router.put('/:messageId',
 //--------------------
 // Destroy
 router.delete('/:messageId',
-    (req, res) => {
-        // Here we used a dynamic object property to exclude the message we want to delete from the rest of the messages object
-        const { [req.params.messageId]: message, ...otherMessages } = req.context.models.messages;
+    async (req, res) => {
+        // Finds Message to be deleted from DB
+        const message = await req.context.models.Message.findById(
+            req.params.messageId
+        );
 
-        // Reassigns values inside messages Object with otherMessages (all the messages except the one just deleted)
-        req.context.models.messages = otherMessages;
+        if (message) 
+        {
+            await message.deleteOne();
+        }
 
+        // return res.send('Message deleted');
         return res.send(message);
-        // return res.send(`DELETE HTTP method on messages/${req.params.messageId} resource`);
     }
 );
 

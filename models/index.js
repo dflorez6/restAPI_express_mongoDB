@@ -1,28 +1,32 @@
-let users = {
-    1: {
-        id: '1',
-        username: 'Robin Wieruch',
-    },
-    2: {
-        id: '2',
-        username: 'Dave Davids',
-    },
-};
+//====================
+// ENV
+//====================
+// Fix for __dirname && __filename in ES6
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Import dotenv
+import dotenv from 'dotenv';
+// TODO: Since this file is one level deepr in the folder structure THIS CHANGED TO '../.env' TWO .. to make it work
+dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
-let messages = {
-    1: {
-        id: '1',
-        text: 'Hello World',
-        userId: '1',
-    },
-    2: {
-        id: '2',
-        text: 'By World',
-        userId: '2',
-    },
-};
+//====================
+// Data Models
+//====================
+// Import the dependencies
+import mongoose from 'mongoose';
+import User from './user.js'
+import Message from './message.js'
 
-export default {
-    users,
-    messages,
-};
+// Connect to DB
+const connectDB = () => {
+    return mongoose.connect(process.env.DATABASE_URL);
+}
+
+// Combine models
+const models = { User, Message };
+
+// Export
+export { connectDB };
+export default models;
